@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_04_18_110751) do
+ActiveRecord::Schema[7.0].define(version: 2026_04_18_210150) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -21,7 +21,9 @@ ActiveRecord::Schema[7.0].define(version: 2026_04_18_110751) do
     t.string "phone_number"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "company_code"
     t.bigint "country_id"
+    t.index ["company_code"], name: "index_companies_on_company_code", unique: true
     t.index ["country_id"], name: "index_companies_on_country_id"
     t.index ["name"], name: "index_companies_on_name", unique: true
   end
@@ -50,6 +52,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_04_18_110751) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "company_id"
+    t.string "password_digest"
     t.index ["company_id"], name: "index_employees_on_company_id"
     t.index ["emp_number"], name: "index_employees_on_emp_number", unique: true
   end

@@ -7,10 +7,24 @@
     <%= csp_meta_tag %>
 
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
-    <%= javascript_importmap_tags %>
   </head>
 
   <body>
     <%= yield %>
+    <script type="module">
+      // Add a leading slash if it was missing
+      import RefreshRuntime from 'http://localhost:5173/@react-refresh'
+      RefreshRuntime.injectIntoGlobalHook(window)
+      window.$RefreshReg$ = () => {}
+      window.$RefreshSig$ = () => (type) => type
+      window.__vite_plugin_react_preamble_installed__ = true
+    </script>
+
+    <% if Rails.env.development? %>
+      <script type="module" src="http://localhost:5173/@vite/client"></script>
+      <script type="module" src="http://localhost:5173/app/frontend/entrypoints/app.jsx" defer></script>
+    <% else %>
+      <script type="module" src="http://localhost:5173/app/frontend/entrypoints/app.jsx" defer></script>
+    <% end %>
   </body>
 </html>

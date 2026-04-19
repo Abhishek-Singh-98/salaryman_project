@@ -7,7 +7,6 @@ class CreateCompanies < ActiveRecord::Migration[7.0]
       t.string :phone_number
       t.timestamps
     end
-      add_reference :companies, :country, foreign_key: true
       add_index :companies, :name, unique: true
   end
 end
