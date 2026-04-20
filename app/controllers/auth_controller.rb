@@ -19,9 +19,9 @@ class AuthController < ApplicationController
   end
 
   def login
-    if @employee&.authenticate(login_params[:password])
-      session[:employee_id] = @employee.id
-      render json: @employee, status: :ok
+    if @hr_employee&.authenticate(login_params[:password])
+      session[:employee_id] = @hr_employee.id
+      render json: @hr_employee, status: :ok
     else
       render json: { error: 'Please check your email and password' }, status: :unauthorized
     end
@@ -56,8 +56,8 @@ class AuthController < ApplicationController
 
   def validate_email
     email = params[:auth][:email]
-    @employee ||= Profile.find_by(email: email)&.employee
-    unless @employee
+    @hr_employee ||= Profile.find_by(email: email)&.employee
+    unless @hr_employee
       render json: { error: 'Email not found' }, status: :unprocessable_entity
     end
   end

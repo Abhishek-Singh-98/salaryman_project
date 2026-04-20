@@ -202,7 +202,13 @@ RSpec.describe EmployeesController, type: :controller do
       it 'creates employee without profile' do
         expect {
           post :create, params: no_profile_params
-        }.to change(Employee, :count).by(1)
+        }.to change(Employee, :count).by(0)
+      end
+
+      it 'gives error message' do
+        post :create, params: no_profile_params
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(JSON.parse(response.body)['error']).to eq('Email is required')
       end
     end
   end
@@ -215,13 +221,15 @@ RSpec.describe EmployeesController, type: :controller do
           full_name: 'Updated Name',
           salary: 55000,
           profile_attributes: {
-            phone_number: '+1987654321'
+            id: employee.profile.id,
+            phone_number: '+1987654321',
+            email: employee.profile.email
           }
         }
       }
     end
 
-    before { employee }
+    # before { employee }
 
     context 'with valid parameters' do
       it 'updates the employee' do
@@ -268,11 +276,10 @@ RSpec.describe EmployeesController, type: :controller do
   end
 
   describe 'DELETE #destroy' do
-    it 'deletes the employee' do
+    it 'deactivates the employee' do
       employee # ensure it exists
-      expect {
-        delete :destroy, params: { id: employee.id }
-      }.to change(Employee, :count).by(-1)
+      delete :destroy, params: { id: employee.id }
+      expect(employee.reload.active).to be false
     end
 
     it 'returns ok status' do
@@ -289,7 +296,7 @@ RSpec.describe EmployeesController, type: :controller do
 
     context 'deleting non-existent employee' do
       it 'returns not found' do
-        delete :destroy, params: { id: 99999 }
+        delete :destroy, params: { id: 'WRNG999' }
         expect(response).to have_http_status(:not_found)
       end
     end

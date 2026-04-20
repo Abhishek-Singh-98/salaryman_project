@@ -185,15 +185,16 @@ RSpec.describe AuthController, type: :controller do
   end
 
   describe 'DELETE #logout' do
-    before { session[:employee_id] = employee.id }
+    let(:hr_emp) {create(:employee, :hr_manager, company: company) }
+    before { session[:employee_id] = hr_emp.id }
 
     it 'clears session' do
-      delete :logout, params: { employee_id: employee.id }
+      delete :logout, params: { employee_id: hr_emp.id }
       expect(session[:employee_id]).to be_nil
     end
 
     it 'returns ok status' do
-      delete :logout, params: { employee_id: employee.id }
+      delete :logout, params: { employee_id: hr_emp.id }
       expect(response).to have_http_status(:ok)
     end
   end
