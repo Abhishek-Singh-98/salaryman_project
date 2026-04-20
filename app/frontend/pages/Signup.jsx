@@ -25,16 +25,17 @@ export default function Signup() {
                     password,
                     password_confirmation: passwordConfirmation,
                     company_code: companyCode,
+                    joining_date: joining_date,
                     full_name: fullName
                 }
             }),
         });
 
         const data = await response.json();
-
+        
         if (response.ok) {
             localStorage.setItem("loggedIn", "true")
-            localStorage.setItem("employeeId", data.id);
+            localStorage.setItem("employeeId", data.employee.id);
             console.log("Signup successful");
             window.location.href = "/dashboard";
         } else {

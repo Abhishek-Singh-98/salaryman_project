@@ -11,7 +11,7 @@ class AuthController < ApplicationController
     @employee.build_profile(profile_params)
     if @employee.save
       session[:employee_id] = @employee.id
-      render json: { message: 'User created successfully' }, status: :created
+      render json: { employee: @employee, message: 'User created successfully' }, status: :created
     else
       render json: { errors: @employee.errors.full_messages }, status: :unprocessable_entity
     end

@@ -18,7 +18,7 @@ class EmployeesController < ApplicationController
 
   def show
     if @employee && @employee.company == @company
-      render json: @employee.to_json(include: :profile), status: :ok
+      render json: @employee.to_json(include: [:profile, :employee_job_title]), status: :ok
     else
       render json: { message: 'Employee not found' }, status: :not_found
     end
@@ -107,8 +107,8 @@ class EmployeesController < ApplicationController
       render json: { error: 'Phone number is required' }, status: :unprocessable_entity
     elsif phone_number.length > 13
       render json: { error: 'Phone number must be a maximum of 13 characters' }, status: :unprocessable_entity
-    elsif !phone_number.match?(/\A[0-9\-\+\s\(\)]*\z/)
-      render json: { error: 'Phone number must contain only numbers, spaces, dashes, parentheses, or plus sign' }, status: :unprocessable_entity
+    elsif !phone_number.match?(/\A\+?[0-9]+\z/)
+      render json: { error: 'Phone number must contain only numbers & one plus sign at the beginning' }, status: :unprocessable_entity
     end
   end
 

@@ -1,5 +1,6 @@
 class ApplicationController < ActionController::Base
   skip_before_action :verify_authenticity_token
+
   def current_employee
     @hr_employee ||= Employee.find_by(id: session[:employee_id]) if session[:employee_id]
   end
@@ -10,5 +11,4 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  # helper_method :current_employee
 end

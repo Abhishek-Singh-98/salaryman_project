@@ -28,12 +28,12 @@ module AuthHelper
 
   def validate_phone_number
     phone_number = params[:auth][:phone_number]
-    if phone_number.blank?
-      render json: { error: 'Phone number is required' }, status: :unprocessable_entity
-    elsif phone_number.length > 13
+    return if phone_number.blank?
+
+    if phone_number.length > 13
       render json: { error: 'Phone number must be a maximum of 13 characters' }, status: :unprocessable_entity
-    elsif !phone_number.match?(/\A[0-9\+\s\(\)]*\z/)
-      render json: { error: 'Phone number must contain only numbers, spaces, dashes, parentheses, or plus sign' }, status: :unprocessable_entity
+    elsif !phone_number.match?(/\A\+?[0-9]+\z/)
+      render json: { error: 'Phone number must contain only numbers and one plus sign at the beginning' }, status: :unprocessable_entity
     end
   end
 end
