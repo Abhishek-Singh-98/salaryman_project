@@ -60,7 +60,7 @@ export default function Navbar({ loggedIn, onLogout }) {
             {renderLink("/dashboard", "Dashboard")}
             {renderLink("/employees", "Employees List")}
             {renderLink(`/employees/${localStorage.getItem("employeeId")}`, "My Profile")}
-            {renderLink("/salary_insight", "Salary Insight")}
+            {renderLink("/salary_insights", "Salary Insight")}
             <button
               type="button"
               onClick={onLogout}

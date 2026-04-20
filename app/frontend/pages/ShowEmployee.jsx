@@ -105,7 +105,7 @@ export default function ShowEmployee() {
         </div>
         <div style={fieldStyle}>
           <div style={labelStyle}>Role:</div>
-          <div style={valueStyle}>{employee.role}</div>
+          <div style={valueStyle}>{employee.role?.replace(/_/g, " ").toUpperCase() || "N/A"}</div>
         </div>
         <div style={fieldStyle}>
           <div style={labelStyle}>Salary:</div>

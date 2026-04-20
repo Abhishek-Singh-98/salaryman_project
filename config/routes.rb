@@ -10,5 +10,8 @@ Rails.application.routes.draw do
   root "home#index"
   get '*path', to: 'home#index', constraints: ->(req) { req.format.html? }
 
-   resources :employees, only: [:index, :show, :create, :update, :destroy]
+  resources :employees, only: [:index, :show, :create, :update, :destroy]
+  resources :job_titles, only: [:index]
+  resources :countries, only: [:index]
+  resources :salary_insights, only: [:index]
 end

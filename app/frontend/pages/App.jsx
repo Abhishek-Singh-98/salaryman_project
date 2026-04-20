@@ -39,7 +39,7 @@ function AppRoutes({ loggedIn, setLoggedIn }) {
           <Route path="/employees" element={<EmployeesList />} />
           <Route path="/employees/new" element={<NewEmployee />} />          <Route path="/employees/:id" element={<ShowEmployee />} />
           <Route path="/employees/:id/edit" element={<EditEmployee />} />          <Route path="/my_profile" element={<MyProfile />} />
-          <Route path="/salary_insight" element={<SalaryInsight />} />
+          <Route path="/salary_insights" element={<SalaryInsight />} />
         </Routes>
       </div>
     </>
