@@ -15,7 +15,7 @@ class Employee < ApplicationRecord
 
   scope :only_active_employees, -> { where(active: true, role: :employee) }
 
-  before_save :assign_employee_number, if: :new_record?
+  before_validation :assign_employee_number, if: :new_record?
   
   private
 

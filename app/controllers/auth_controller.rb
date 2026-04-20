@@ -1,6 +1,5 @@
 class AuthController < ApplicationController
   include AuthHelper
-  skip_before_action :verify_authenticity_token
   before_action :authenticate_user, only: [:logout]
   before_action :check_email_presence_and_uniqueness, :check_password_match, only: [:sign_up]
   before_action :validate_company_code, only: [:sign_up, :login]
