@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function NewEmployee() {
@@ -9,9 +9,27 @@ export default function NewEmployee() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
   const [joiningDate, setJoiningDate] = useState("");
+  const [jobTitleId, setJobTitleId] = useState("");
+  const [jobTitles, setJobTitles] = useState([]);
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+
+  useEffect(() => {
+    fetch("/job_titles")
+      .then(res => res.json())
+      .then(data => {
+        console.log("Fetched job titles:", data);
+        if (Array.isArray(data)) {
+          setJobTitles(data);
+        }
+      })
+      .catch(() => setJobTitles([]));
+  }, []);
+
+  const handleJobTitleIdChange = (value) => {
+    setJobTitleId(value);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -37,6 +55,7 @@ export default function NewEmployee() {
             date_of_birth: dateOfBirth,
             joining_date: joiningDate,
           },
+          job_title_id: jobTitleId || null,
         },
       }),
     });
@@ -103,6 +122,13 @@ export default function NewEmployee() {
     fontWeight: 600,
   };
 
+  const selectStyle = {
+    padding: "10px",
+    border: "1px solid #d1d5db",
+    borderRadius: "6px",
+    fontSize: "1rem",
+  };
+
   return (
     <div style={formContainerStyle}>
       <div style={cardStyle}>
@@ -137,6 +163,21 @@ export default function NewEmployee() {
 
           <div style={rowStyle}>
             <div style={inputGroupStyle}>
+              <label style={labelStyle}>Job Title</label>
+              <select 
+                style={inputStyle} 
+                value={jobTitleId} 
+                onChange={(e) => handleJobTitleIdChange(e.target.value)}
+              >
+                <option value="">Select Job Title</option>
+                {jobTitles.map((jt) => (
+                  <option key={jt.id} value={jt.id}>
+                    {jt.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div style={inputGroupStyle}>
               <label style={labelStyle}>Email</label>
               <input
                 type="email"
@@ -146,6 +187,9 @@ export default function NewEmployee() {
                 style={inputStyle}
               />
             </div>
+          </div>
+
+          <div style={rowStyle}>
             <div style={inputGroupStyle}>
               <label style={labelStyle}>Phone Number</label>
               <input
@@ -155,9 +199,6 @@ export default function NewEmployee() {
                 style={inputStyle}
               />
             </div>
-          </div>
-
-          <div style={rowStyle}>
             <div style={inputGroupStyle}>
               <label style={labelStyle}>Joining Date</label>
               <input
@@ -168,6 +209,9 @@ export default function NewEmployee() {
                 style={inputStyle}
               />
             </div>
+          </div>
+
+          <div style={rowStyle}>
             <div style={inputGroupStyle}>
               <label style={labelStyle}>Date of Birth</label>
               <input
@@ -177,9 +221,6 @@ export default function NewEmployee() {
                 style={inputStyle}
               />
             </div>
-          </div>
-
-          <div style={inputGroupStyle}>
             <div style={inputGroupStyle}>
               <label style={labelStyle}>Password</label>
               <input

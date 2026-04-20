@@ -1,8 +1,9 @@
 class EmployeesController < ApplicationController
+  include EmployeesHelper
   before_action :authenticate_user
   before_action :set_company
   before_action :set_employee, :validate_colleague, only: [:show, :update, :destroy]
-  before_action :check_email_presence, :check_email_uniqueness, only: [:create, :update]
+  before_action :check_email_presence, :check_email_uniqueness, :check_job_title_presence, only: [:create, :update]
 
 
   def index
@@ -35,6 +36,7 @@ class EmployeesController < ApplicationController
     @employee.role = :employee
 
     if @employee.save
+      assign_job_title_to_employee
       render json: @employee.to_json(include: :profile), status: :created
     else
       render json: { errors: @employee.errors.full_messages }, status: :unprocessable_entity
@@ -44,6 +46,7 @@ class EmployeesController < ApplicationController
 
   def update
     if @employee.update(employee_params)
+      check_and_update_job_title
       render json: @employee.to_json(include: :profile), status: :ok
     else
       render json: { errors: @employee.errors.full_messages }, status: :unprocessable_entity
@@ -89,10 +92,16 @@ class EmployeesController < ApplicationController
   end
 
   def check_email_uniqueness
-    # email = params[:employee][:profile_attributes][:email]
     existing_profile = Profile.find_by(email: @email)
     if existing_profile && existing_profile.employee != @employee
       render json: { error: 'Email has already been taken' }, status: :unprocessable_entity
+    end
+  end
+
+  def check_job_title_presence
+    job_title_id = params[:employee][:job_title_id]
+    if job_title_id.blank? || !JobTitle.exists?(job_title_id)
+      render json: { error: 'Valid job title is required' }, status: :unprocessable_entity
     end
   end
 end

@@ -7,6 +7,10 @@ RSpec.describe EmployeesController, type: :controller do
   let(:employee) { create(:employee, :with_profile, company: company) }
   let(:other_company) { create(:company, name: 'NewTech Company', country: country) }
   let(:other_employee) { create(:employee, company: other_company) }
+  let(:job_title) { create(:job_title, department: 0) }
+  let(:hr_job_title) { create(:job_title, title: 'HR Manager', department: 1) }
+  let(:emp_job_title1) { create(:employee_job_title, employee: employee, job_title: job_title) }
+  let(:emp_job_title2) { create(:employee_job_title, employee: hr_manager, job_title: hr_job_title) }
 
   before do
     session[:employee_id] = hr_manager.id
@@ -103,7 +107,8 @@ RSpec.describe EmployeesController, type: :controller do
             phone_number: '+1234567890',
             date_of_birth: '1995-05-15',
             joining_date: '2023-06-01'
-          }
+          },
+          job_title_id: job_title.id
         }
       }
     end
@@ -169,7 +174,8 @@ RSpec.describe EmployeesController, type: :controller do
             phone_number: '+1234567890',
             date_of_birth: '1995-05-15',
             joining_date: '2023-06-01'
-          }
+          },
+          job_title_id: job_title.id
         }
       }
        }
@@ -211,6 +217,22 @@ RSpec.describe EmployeesController, type: :controller do
         expect(JSON.parse(response.body)['error']).to eq('Email is required')
       end
     end
+
+    context 'with missing job title' do
+      let(:no_job_title_params) { valid_params.deep_merge(employee: { job_title_id: nil }) }
+
+      it 'does not create employee' do
+        expect {
+          post :create, params: no_job_title_params
+        }.not_to change(Employee, :count)
+      end
+
+      it 'gives error message' do
+        post :create, params: no_job_title_params
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(JSON.parse(response.body)['error']).to eq('Valid job title is required')
+      end
+    end
   end
 
   describe 'PUT #update' do
@@ -224,7 +246,8 @@ RSpec.describe EmployeesController, type: :controller do
             id: employee.profile.id,
             phone_number: '+1987654321',
             email: employee.profile.email
-          }
+          },
+          job_title_id: job_title.id
         }
       }
     end
@@ -271,6 +294,35 @@ RSpec.describe EmployeesController, type: :controller do
       it 'returns not found' do
         put :update, params: { id: other_employee.id, employee: { full_name: 'Hacked' } }
         expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context 'updating job title of any employee' do
+      before do
+        emp_job_title1
+        update_params[:employee][:job_title_id] = hr_job_title.id
+      end
+
+      it 'updates job title of employee' do
+        put :update, params: update_params
+        expect(employee.job_title.reload).to eq(hr_job_title)
+      end
+    end
+
+    context 'updating job title of hr manager' do
+      before do
+        create(:profile, employee: hr_manager, email: 'hr.manager@example.com')
+        emp_job_title2
+        update_params[:id] = hr_manager.id
+        update_params[:employee][:job_title_id] = job_title.id
+        update_params[:employee][:profile_attributes] = {
+          id: hr_manager.profile.id, 
+          email: hr_manager.profile.email}
+      end
+
+      it 'does not update job title of hr manager' do
+        put :update, params: update_params
+        expect(hr_manager.job_title.reload).to eq(job_title)
       end
     end
   end

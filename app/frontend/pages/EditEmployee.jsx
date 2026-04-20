@@ -15,6 +15,8 @@ export default function EditEmployee() {
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(true);
+  const [jobTitleId, setJobTitleId] = useState("");
+  const [jobTitles, setJobTitles] = useState([]);
 
   useEffect(() => {
     fetch(`/employees/${id}`)
@@ -28,6 +30,7 @@ export default function EditEmployee() {
           setPhoneNumber(data.profile?.phone_number || "");
           setDateOfBirth(data.profile?.date_of_birth || "");
           setJoiningDate(data.profile?.joining_date || "");
+          setJobTitleId(data.employee_job_title?.job_title_id || "");
         } else {
           setErrorMessage("Employee not found");
         }
@@ -39,6 +42,21 @@ export default function EditEmployee() {
         setLoading(false);
       });
   }, [id]);
+
+  useEffect(() => {
+    fetch("/job_titles")
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setJobTitles(data);
+        }
+      })
+      .catch(() => setJobTitles([]));
+  }, []);
+
+  const handleJobTitleChange = (value) => {
+    setJobTitleId(value);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -64,6 +82,7 @@ export default function EditEmployee() {
             date_of_birth: dateOfBirth,
             joining_date: joiningDate,
           },
+          job_title_id: jobTitleId || null,
         },
       }),
     });
@@ -177,6 +196,24 @@ export default function EditEmployee() {
               />
             </div>
             <div style={inputGroupStyle}>
+              <label style={labelStyle}>Job Title</label>
+              <select
+                style={inputStyle}
+                value={jobTitleId}
+                onChange={(e) => handleJobTitleChange(e.target.value)}
+              >
+                <option value="">Select Job Title</option>
+                {jobTitles.map((jt) => (
+                  <option key={jt.id} value={jt.id}>
+                    {jt.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div style={rowStyle}>
+            <div style={inputGroupStyle}>
               <label style={labelStyle}>Email</label>
               <input
                 type="email"
@@ -186,9 +223,6 @@ export default function EditEmployee() {
                 style={inputStyle}
               />
             </div>
-          </div>
-
-          <div style={rowStyle}>
             <div style={inputGroupStyle}>
               <label style={labelStyle}>Phone Number</label>
               <input
@@ -198,6 +232,9 @@ export default function EditEmployee() {
                 style={inputStyle}
               />
             </div>
+          </div>
+
+          <div style={rowStyle}>
             <div style={inputGroupStyle}>
               <label style={labelStyle}>Date of Birth</label>
               <input
@@ -207,9 +244,6 @@ export default function EditEmployee() {
                 style={inputStyle}
               />
             </div>
-          </div>
-
-          <div style={rowStyle}>
             <div style={inputGroupStyle}>
               <label style={labelStyle}>Joining Date</label>
               <input
@@ -220,6 +254,9 @@ export default function EditEmployee() {
                 style={inputStyle}
               />
             </div>
+          </div>
+
+          <div style={rowStyle}>
             <div style={inputGroupStyle}>
               <label style={labelStyle}>New Password (optional)</label>
               <input
@@ -229,9 +266,6 @@ export default function EditEmployee() {
                 style={inputStyle}
               />
             </div>
-          </div>
-
-          {password && (
             <div style={inputGroupStyle}>
               <label style={labelStyle}>Confirm New Password</label>
               <input
@@ -242,7 +276,9 @@ export default function EditEmployee() {
                 style={inputStyle}
               />
             </div>
-          )}
+          </div>
+
+
 
           <div style={{ display: "flex", gap: "12px", marginTop: "24px" }}>
             <button type="submit" style={buttonStyle}>Update Employee</button>
