@@ -9,6 +9,7 @@ RSpec.describe Profile, type: :model do
 
   describe 'validations' do
     it { should validate_presence_of(:email) }
+    it { should validate_presence_of(:phone_number) }
   end
 
   describe 'attributes' do
@@ -32,10 +33,10 @@ RSpec.describe Profile, type: :model do
       end
     end
 
-    context 'without phone_number' do
-      it 'is valid without phone_number' do
+    context 'invalid without phone_number' do
+      it 'is invalid without phone_number' do
         profile = build(:profile, phone_number: nil)
-        expect(profile).to be_valid
+        expect(profile).not_to be_valid
       end
     end
 

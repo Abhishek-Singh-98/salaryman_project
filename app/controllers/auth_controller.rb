@@ -1,7 +1,7 @@
 class AuthController < ApplicationController
   include AuthHelper
   before_action :authenticate_user, only: [:logout]
-  before_action :check_email_presence_and_uniqueness, :check_password_match, only: [:sign_up]
+  before_action :check_email_presence_and_uniqueness, :validate_phone_number, :check_password_match, only: [:sign_up]
   before_action :validate_company_code, only: [:sign_up, :login]
   before_action :validate_email, only: [:login]
 

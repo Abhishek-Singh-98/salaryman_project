@@ -14,7 +14,6 @@ RSpec.describe Employee, type: :model do
   describe 'validations' do
     it { should validate_presence_of(:full_name) }
     it { should validate_presence_of(:emp_number) }
-    it { should validate_uniqueness_of(:emp_number) }
     it { should validate_numericality_of(:salary).is_greater_than(0) }
   end
 
@@ -40,6 +39,7 @@ RSpec.describe Employee, type: :model do
   describe 'edge cases' do
     context 'with duplicate emp_number' do
       it 'is invalid with duplicate emp_number' do
+        allow(Employee).to receive_message_chain(:where, :order, :last).and_return(nil)
         duplicate = build(:employee, emp_number: employee.emp_number, company: employee.company)
         expect(duplicate).not_to be_valid
         expect(duplicate.errors[:emp_number]).to include("has already been taken")

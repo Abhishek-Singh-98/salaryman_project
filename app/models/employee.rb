@@ -20,6 +20,8 @@ class Employee < ApplicationRecord
   private
 
   def assign_employee_number
+    return unless self.company_id
+
     last_employee = Employee.where(company_id: self.company_id).order(:created_at).last
     self.emp_number = if last_employee 
       prefix = last_employee.emp_number[/[A-Za-z]+/]

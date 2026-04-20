@@ -3,7 +3,7 @@ class EmployeesController < ApplicationController
   before_action :authenticate_user
   before_action :set_company
   before_action :set_employee, :validate_colleague, only: [:show, :update, :destroy]
-  before_action :check_email_presence, :check_email_uniqueness, :check_job_title_presence, only: [:create, :update]
+  before_action :check_email_presence, :check_email_uniqueness, :check_phone_number, :check_job_title_presence, only: [:create, :update]
 
 
   def index
@@ -88,6 +88,8 @@ class EmployeesController < ApplicationController
     @email = profile_attrs[:email]
     if @email.blank?
       render json: { error: 'Email is required' }, status: :unprocessable_entity
+    elsif !@email.match?(URI::MailTo::EMAIL_REGEXP)
+      render json: { error: 'Email must be a valid email address' }, status: :unprocessable_entity
     end
   end
 
@@ -95,6 +97,18 @@ class EmployeesController < ApplicationController
     existing_profile = Profile.find_by(email: @email)
     if existing_profile && existing_profile.employee != @employee
       render json: { error: 'Email has already been taken' }, status: :unprocessable_entity
+    end
+  end
+
+  def check_phone_number
+    profile_attrs = params[:employee][:profile_attributes].presence || {}
+    phone_number = profile_attrs[:phone_number]
+    if phone_number.blank?
+      render json: { error: 'Phone number is required' }, status: :unprocessable_entity
+    elsif phone_number.length > 13
+      render json: { error: 'Phone number must be a maximum of 13 characters' }, status: :unprocessable_entity
+    elsif !phone_number.match?(/\A[0-9\-\+\s\(\)]*\z/)
+      render json: { error: 'Phone number must contain only numbers, spaces, dashes, parentheses, or plus sign' }, status: :unprocessable_entity
     end
   end
 

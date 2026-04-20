@@ -311,13 +311,14 @@ RSpec.describe EmployeesController, type: :controller do
 
     context 'updating job title of hr manager' do
       before do
-        create(:profile, employee: hr_manager, email: 'hr.manager@example.com')
+        create(:profile, employee: hr_manager, email: 'hr.manager@example.com',
+        phone_number: '+1559876543', date_of_birth: '1980-01-01', joining_date: '2010-01-01')
         emp_job_title2
         update_params[:id] = hr_manager.id
         update_params[:employee][:job_title_id] = job_title.id
         update_params[:employee][:profile_attributes] = {
           id: hr_manager.profile.id, 
-          email: hr_manager.profile.email}
+          email: hr_manager.profile.email, phone_number: hr_manager.profile.phone_number}
       end
 
       it 'does not update job title of hr manager' do

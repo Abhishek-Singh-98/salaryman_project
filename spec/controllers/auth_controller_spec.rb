@@ -12,6 +12,7 @@ RSpec.describe AuthController, type: :controller do
           email: 'newuser@example.com',
           password: 'password123',
           password_confirmation: 'password123',
+          phone_number: '+1551234567',
           company_code: company.company_code,
           full_name: 'New User',
           joining_date: '2023-01-01'
