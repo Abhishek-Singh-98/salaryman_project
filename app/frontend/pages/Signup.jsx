@@ -34,6 +34,7 @@ export default function Signup() {
 
         if (response.ok) {
             localStorage.setItem("loggedIn", "true")
+            localStorage.setItem("employeeId", data.id);
             console.log("Signup successful");
             window.location.href = "/dashboard";
         } else {

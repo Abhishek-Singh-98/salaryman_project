@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_04_18_210150) do
+ActiveRecord::Schema[7.0].define(version: 2026_04_19_151316) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -53,6 +53,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_04_18_210150) do
     t.datetime "updated_at", null: false
     t.bigint "company_id"
     t.string "password_digest"
+    t.boolean "active", default: true
     t.index ["company_id"], name: "index_employees_on_company_id"
     t.index ["emp_number"], name: "index_employees_on_emp_number", unique: true
   end
@@ -70,7 +71,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_04_18_210150) do
     t.string "email", null: false
     t.string "phone_number"
     t.date "date_of_birth"
-    t.datetime "joining_date"
+    t.date "joining_date"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "employee_id"

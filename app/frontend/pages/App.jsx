@@ -5,6 +5,9 @@ import Login from "./Login";
 import Signup from "./Signup";
 import Dashboard from "./Dashboard";
 import EmployeesList from "./EmployeesList";
+import NewEmployee from "./NewEmployee";
+import ShowEmployee from "./ShowEmployee";
+import EditEmployee from "./EditEmployee";
 import MyProfile from "./MyProfile";
 import SalaryInsight from "./SalaryInsight";
 
@@ -34,7 +37,8 @@ function AppRoutes({ loggedIn, setLoggedIn }) {
           <Route path="/signup" element={<Signup />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/employees" element={<EmployeesList />} />
-          <Route path="/my_profile" element={<MyProfile />} />
+          <Route path="/employees/new" element={<NewEmployee />} />          <Route path="/employees/:id" element={<ShowEmployee />} />
+          <Route path="/employees/:id/edit" element={<EditEmployee />} />          <Route path="/my_profile" element={<MyProfile />} />
           <Route path="/salary_insight" element={<SalaryInsight />} />
         </Routes>
       </div>

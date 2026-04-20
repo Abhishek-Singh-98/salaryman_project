@@ -28,7 +28,8 @@ export default function Login() {
             const data = await response.json();
 
             if (response.ok) {
-                localStorage.setItem("loggedIn", "true")
+                localStorage.setItem("loggedIn", "true");
+                localStorage.setItem("employeeId", data.id);
                 console.log("Login successful");
                 window.location.href = "/dashboard";
             } else {

@@ -2,13 +2,13 @@ class AuthController < ApplicationController
   include AuthHelper
   skip_before_action :verify_authenticity_token
   before_action :authenticate_user, only: [:logout]
-  before_action :check_password_match, only: [:sign_up]
+  before_action :check_email_presence_and_uniqueness, :check_password_match, only: [:sign_up]
   before_action :validate_company_code, only: [:sign_up, :login]
-  before_action :validate_email, only: [:logout, :login]
+  before_action :validate_email, only: [:login]
 
   def sign_up
     @employee = Employee.new(sign_up_params)
-    assign_employee_number_and_role
+    assign_employee_number_and_role_to_hr
     @employee.build_profile(profile_params)
     if @employee.save
       session[:employee_id] = @employee.id
@@ -56,7 +56,7 @@ class AuthController < ApplicationController
 
   def validate_email
     email = params[:auth][:email]
-    @employee = Profile.find_by(email: email)&.employee
+    @employee ||= Profile.find_by(email: email)&.employee
     unless @employee
       render json: { error: 'Email not found' }, status: :unprocessable_entity
     end

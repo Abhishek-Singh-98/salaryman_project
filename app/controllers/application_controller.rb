@@ -1,7 +1,7 @@
 class ApplicationController < ActionController::Base
 
   def current_employee
-    @current_employee ||= Employee.find_by(id: session[:employee_id]) if session[:employee_id]
+    @employee ||= Employee.find_by(id: session[:employee_id]) if session[:employee_id]
   end
 
   def authenticate_user

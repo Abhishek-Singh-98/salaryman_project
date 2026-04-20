@@ -1,9 +1,137 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 export default function MyProfile() {
+  const navigate = useNavigate();
+  const [employee, setEmployee] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const employeeId = localStorage.getItem("employeeId");
+    if (!employeeId) {
+      setError("No user logged in");
+      setLoading(false);
+      return;
+    }
+
+    fetch(`/employees/${employeeId}`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.id) {
+          setEmployee(data);
+        } else {
+          setError("Profile not found");
+        }
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error("Error fetching profile:", error);
+        setError("Failed to load profile");
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>{error}</div>;
+
+  const containerStyle = {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    minHeight: "calc(100vh - 96px)",
+    padding: "20px",
+    background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+  };
+
+  const cardStyle = {
+    background: "#ffffff",
+    borderRadius: "12px",
+    boxShadow: "0 10px 30px rgba(0, 0, 0, 0.12)",
+    width: "100%",
+    maxWidth: "600px",
+    padding: "36px",
+  };
+
+  const fieldStyle = {
+    marginBottom: "16px",
+  };
+
+  const labelStyle = {
+    fontWeight: 600,
+    color: "#333333",
+  };
+
+  const valueStyle = {
+    marginTop: "4px",
+    color: "#555555",
+  };
+
+  const buttonStyle = {
+    background: "#7c3aed",
+    color: "#ffffff",
+    border: "none",
+    borderRadius: "8px",
+    padding: "10px 16px",
+    cursor: "pointer",
+    marginRight: "8px",
+  };
+
   return (
-    <div>
-        <br /> <br />
-      <h1>My Profile</h1>
-      <p>This page will display user profile details when profile integration is complete.</p>
+    <div style={containerStyle}>
+      <div style={cardStyle}>
+        <h2>My Profile</h2>
+        <div style={fieldStyle}>
+          <div style={labelStyle}>ID:</div>
+          <div style={valueStyle}>{employee.id}</div>
+        </div>
+        <div style={fieldStyle}>
+          <div style={labelStyle}>Full Name:</div>
+          <div style={valueStyle}>{employee.full_name}</div>
+        </div>
+        <div style={fieldStyle}>
+          <div style={labelStyle}>Employee Number:</div>
+          <div style={valueStyle}>{employee.emp_number}</div>
+        </div>
+        <div style={fieldStyle}>
+          <div style={labelStyle}>Email:</div>
+          <div style={valueStyle}>{employee.profile?.email || "N/A"}</div>
+        </div>
+        <div style={fieldStyle}>
+          <div style={labelStyle}>Phone Number:</div>
+          <div style={valueStyle}>{employee.profile?.phone_number || "N/A"}</div>
+        </div>
+        <div style={fieldStyle}>
+          <div style={labelStyle}>Date of Birth:</div>
+          <div style={valueStyle}>{employee.profile?.date_of_birth || "N/A"}</div>
+        </div>
+        <div style={fieldStyle}>
+          <div style={labelStyle}>Joining Date:</div>
+          <div style={valueStyle}>{employee.profile?.joining_date || "N/A"}</div>
+        </div>
+        <div style={fieldStyle}>
+          <div style={labelStyle}>Role:</div>
+          <div style={valueStyle}>{employee.role}</div>
+        </div>
+        <div style={fieldStyle}>
+          <div style={labelStyle}>Salary:</div>
+          <div style={valueStyle}>${employee.salary?.toLocaleString()}</div>
+        </div>
+        <div style={{ marginTop: "24px" }}>
+          <button
+            onClick={() => navigate(`/employees/${employee.id}/edit`)}
+            style={buttonStyle}
+          >
+            Edit Profile
+          </button>
+          <button
+            onClick={() => navigate("/dashboard")}
+            style={{ ...buttonStyle, background: "#e5e7eb", color: "#111827" }}
+          >
+            Back to Dashboard
+          </button>
+        </div>
+      </div>
     </div>
-  )
+  );
 }
