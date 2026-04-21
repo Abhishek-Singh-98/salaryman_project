@@ -1,9 +1,11 @@
 class AuthController < ApplicationController
   include AuthHelper
+  include JobTitleAssignment
+
   before_action :authenticate_user, only: [:logout]
-  before_action :check_email_presence_and_uniqueness, :validate_phone_number, :check_password_match, only: [:sign_up]
-  before_action :validate_company_code, only: [:sign_up, :login]
-  before_action :validate_email, only: [:login]
+  before_action :check_password_match, :fetch_job_title_for_hr, only: [:sign_up]
+  before_action :correct_company_code, only: [:sign_up, :login]
+  before_action :validate_email,:validate_company_code, only: [:login]
 
   def sign_up
     @employee = Employee.new(sign_up_params)
@@ -11,6 +13,7 @@ class AuthController < ApplicationController
     @employee.role = :hr_manager
     @employee.build_profile(profile_params)
     if @employee.save
+      assign_job_title_to_employee(@employee, @job_title_id)
       session[:employee_id] = @employee.id
       render json: { employee: @employee, message: 'User created successfully' }, status: :created
     else
@@ -46,11 +49,17 @@ class AuthController < ApplicationController
     params.require(:auth).permit(:email, :phone_number, :date_of_birth, :joining_date)
   end
 
-  def validate_company_code
+  def correct_company_code
     company_code = params[:auth][:company_code]
     @company = Company.find_by(company_code: company_code)
     unless @company
       render json: { error: 'Invalid company code' }, status: :unprocessable_entity
+    end
+  end
+
+  def validate_company_code
+    unless @hr_employee.company == @company
+      render json: {error: 'Entered Wrong Company Code'}, status: :unauthorized
     end
   end
 
@@ -68,5 +77,9 @@ class AuthController < ApplicationController
     unless password == password_confirmation
       render json: { error: 'Password and confirmation do not match' }, status: :unprocessable_entity
     end
+  end
+
+  def fetch_job_title_for_hr
+    @job_title_id = JobTitle.find_by(department: :hr)&.id
   end
 end

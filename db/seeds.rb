@@ -61,8 +61,8 @@ employees = 10_000.times.map do
     active: true,
     company_id: company.id,
     emp_number: "#{company.company_code.upcase}-EMP#{processed_count + 1}",
-    created_at: now,
-    updated_at: now
+    created_at: Time.current,
+    updated_at: Time.current
 
   }
 end

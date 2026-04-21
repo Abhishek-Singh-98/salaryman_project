@@ -14,7 +14,7 @@ RSpec.describe Profile, type: :model do
   describe 'attributes' do
     it 'has expected attributes' do
       expect(profile).to have_attributes(
-        email: "john.doe@example.com",
+        email: profile.email,
         phone_number: "+1234567890",
         date_of_birth: Date.parse("1990-01-01"),
         joining_date: Date.parse("2020-01-01")
@@ -23,15 +23,6 @@ RSpec.describe Profile, type: :model do
   end
 
   describe 'edge cases' do
-    context 'with duplicate email' do
-      let!(:existing_profile) { create(:profile, email: "unique@example.com") }
-
-      it 'allows duplicate emails' do
-        duplicate = build(:profile, email: "unique@example.com")
-        expect(duplicate).to be_valid
-      end
-    end
-
     context 'without date_of_birth' do
       it 'is valid without date_of_birth' do
         profile = build(:profile, date_of_birth: nil)

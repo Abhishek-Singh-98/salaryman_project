@@ -4,7 +4,7 @@ class EmployeesController < ApplicationController
   before_action :authenticate_user
   before_action :set_company
   before_action :set_employee, :validate_colleague_employee, only: [:show, :update, :destroy]
-  before_action :check_email_presence, :check_email_uniqueness, :check_phone_number, :check_job_title_presence, only: [:create, :update]
+  before_action :check_job_title_presence, only: [:create, :update]
 
 
   def index
@@ -37,6 +37,7 @@ class EmployeesController < ApplicationController
     @employee = Employee.new(employee_params)
     @employee.company = @company
     @employee.role = :employee
+    @employee.build_profile unless @employee.profile
 
     if @employee.save
       assign_job_title_to_employee(@employee, params[:employee][:job_title_id])
@@ -89,37 +90,10 @@ class EmployeesController < ApplicationController
     @company = current_hr_employee.company
   end
 
-  def check_email_presence
-    profile_attrs = params.dig(:employee, :profile_attributes) || {}
-    @email = profile_attrs[:email]
-    if @email.blank?
-      render json: { error: 'Email is required' }, status: :unprocessable_entity
-    elsif !@email.match?(URI::MailTo::EMAIL_REGEXP)
-      render json: { error: 'Email must be a valid email address' }, status: :unprocessable_entity
-    end
-  end
 
-  def check_email_uniqueness
-    existing_profile = Profile.find_by(email: @email)
-    if existing_profile && existing_profile.employee != @employee
-      render json: { error: 'Email has already been taken' }, status: :unprocessable_entity
-    end
-  end
-
-  def check_phone_number
-    profile_attrs = params[:employee][:profile_attributes].presence || {}
-    phone_number = profile_attrs[:phone_number]
-    if phone_number.blank?
-      render json: { error: 'Phone number is required' }, status: :unprocessable_entity
-    elsif phone_number.length > 13
-      render json: { error: 'Phone number must be a maximum of 13 characters' }, status: :unprocessable_entity
-    elsif !phone_number.match?(/\A\+?[0-9]+\z/)
-      render json: { error: 'Phone number must contain only numbers & one plus sign at the beginning' }, status: :unprocessable_entity
-    end
-  end
-
+  
   def check_job_title_presence
-    job_title_id = params[:employee][:job_title_id]
+    job_title_id = params.dig(:employee, :job_title_id)&.to_i
     if job_title_id.blank? || !JobTitle.exists?(job_title_id)
       render json: { error: 'Valid job title is required' }, status: :unprocessable_entity
     end

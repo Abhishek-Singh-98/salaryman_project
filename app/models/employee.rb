@@ -13,6 +13,8 @@ class Employee < ApplicationRecord
   validates :emp_number, uniqueness: true
   validates :salary, numericality: { greater_than: 0 }, allow_blank: true
 
+  validates_associated :profile
+
   scope :only_active_employees, -> { where(active: true, role: :employee) }
 
   before_validation :assign_employee_number, if: :new_record?

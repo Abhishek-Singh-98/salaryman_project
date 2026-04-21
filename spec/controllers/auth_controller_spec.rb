@@ -3,6 +3,7 @@ require 'rails_helper'
 RSpec.describe AuthController, type: :controller do
   let(:country) { create(:country) }
   let(:company) { create(:company, country: country) }
+  let!(:job_title) {create(:job_title, department: 1)}
   let(:employee) { create(:employee, :with_profile, company: company) }
 
   describe 'POST #sign_up' do

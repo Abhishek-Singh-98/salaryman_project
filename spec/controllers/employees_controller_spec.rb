@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe EmployeesController, type: :controller do
   let(:country) { create(:country) }
   let(:company) { create(:company, country: country) }
-  let!(:hr_manager) { create(:employee, :hr_manager, full_name: 'HR Manager', company: company) }
+  let!(:hr_manager) { create(:employee, :with_profile, :hr_manager, full_name: 'HR Manager', company: company) }
   let(:employee) { create(:employee, :with_profile, company: company) }
   let(:other_company) { create(:company, name: 'NewTech Company', country: country) }
   let(:other_employee) { create(:employee, company: other_company) }
@@ -203,7 +203,9 @@ RSpec.describe EmployeesController, type: :controller do
     end
 
     context 'with missing profile attributes' do
-      let(:no_profile_params) { valid_params[:employee].merge(profile_attributes: {}) }
+      let(:no_profile_params) { 
+        valid_params[:employee].merge(profile_attributes: {},
+          job_title_id: job_title.id) }
 
       it 'creates employee without profile' do
         expect {
@@ -212,9 +214,9 @@ RSpec.describe EmployeesController, type: :controller do
       end
 
       it 'gives error message' do
-        post :create, params: no_profile_params
+        post :create, params: {employee: no_profile_params}
         expect(response).to have_http_status(:unprocessable_entity)
-        expect(JSON.parse(response.body)['error']).to eq('Email is required')
+        expect(JSON.parse(response.body)['errors']).to include("Profile email can't be blank")
       end
     end
 
@@ -311,8 +313,8 @@ RSpec.describe EmployeesController, type: :controller do
 
     context 'updating job title of hr manager' do
       before do
-        create(:profile, employee: hr_manager, email: 'hr.manager@example.com',
-        phone_number: '+1559876543', date_of_birth: '1980-01-01', joining_date: '2010-01-01')
+        # create(:profile, employee: hr_manager, email: 'hr.manager@example.com',
+        # phone_number: '+1559876543', date_of_birth: '1980-01-01', joining_date: '2010-01-01')
         emp_job_title2
         update_params[:id] = hr_manager.id
         update_params[:employee][:job_title_id] = job_title.id

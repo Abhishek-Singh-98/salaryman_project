@@ -48,7 +48,34 @@ export default function EmployeesList() {
     }
   };
 
+  const handlePrev = () => {
+    if (currentPage > 1) setCurrentPage(p => p - 1);
+  };
+
+  const handleNext = () => {
+    if (currentPage < totalPages) setCurrentPage(p => p + 1);
+  };
+
+  const isFirst = currentPage === 1;
+  const isLast  = currentPage === totalPages;
+
   const employeeList = Array.isArray(employees) ? employees : [];
+
+  const arrowStyle = (disabled) => ({
+    width: "44px",
+    height: "44px",
+    fontSize: "28px",
+    fontWeight: "900",
+    lineHeight: "1",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    border: `3px solid ${disabled ? "#d1d5db" : "#7c3aed"}`,
+    borderRadius: "8px",
+    background: "transparent",
+    color: disabled ? "#d1d5db" : "#7c3aed",
+    cursor: disabled ? "not-allowed" : "pointer",
+  });
 
   return (
     <div>
@@ -70,6 +97,7 @@ export default function EmployeesList() {
           Add New Employee
         </button>
       </div>
+
       {employeeList.length === 0 ? (
         <p>No employees available.</p>
       ) : (
@@ -96,42 +124,19 @@ export default function EmployeesList() {
                   <td style={{ border: "1px solid #dddddd", padding: "8px" }}>
                     <button
                       onClick={() => navigate(`/employees/${employee.id}`)}
-                      style={{
-                        background: "#10b981",
-                        color: "#ffffff",
-                        border: "none",
-                        borderRadius: "4px",
-                        padding: "4px 8px",
-                        cursor: "pointer",
-                        marginRight: "4px",
-                      }}
+                      style={{ background: "#10b981", color: "#ffffff", border: "none", borderRadius: "4px", padding: "4px 8px", cursor: "pointer", marginRight: "4px" }}
                     >
                       Show
                     </button>
                     <button
                       onClick={() => navigate(`/employees/${employee.id}/edit`)}
-                      style={{
-                        background: "#f59e0b",
-                        color: "#ffffff",
-                        border: "none",
-                        borderRadius: "4px",
-                        padding: "4px 8px",
-                        cursor: "pointer",
-                        marginRight: "4px",
-                      }}
+                      style={{ background: "#f59e0b", color: "#ffffff", border: "none", borderRadius: "4px", padding: "4px 8px", cursor: "pointer", marginRight: "4px" }}
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => handleDelete(employee.id)}
-                      style={{
-                        background: "#ef4444",
-                        color: "#ffffff",
-                        border: "none",
-                        borderRadius: "4px",
-                        padding: "4px 8px",
-                        cursor: "pointer",
-                      }}
+                      style={{ background: "#ef4444", color: "#ffffff", border: "none", borderRadius: "4px", padding: "4px 8px", cursor: "pointer" }}
                     >
                       Delete
                     </button>
@@ -140,25 +145,22 @@ export default function EmployeesList() {
               ))}
             </tbody>
           </table>
-          <div style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
-            {totalPages > 1 && Array.from({ length: totalPages }, (_, index) => (
-              <button
-                key={index + 1}
-                onClick={() => setCurrentPage(index + 1)}
-                style={{
-                  margin: "0 4px",
-                  padding: "8px 12px",
-                  background: currentPage === index + 1 ? "#7c3aed" : "#e5e7eb",
-                  color: currentPage === index + 1 ? "#ffffff" : "#000000",
-                  border: "none",
-                  borderRadius: "4px",
-                  cursor: "pointer",
-                }}
-              >
-                {index + 1}
+
+          {totalPages > 1 && (
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "20px", marginTop: "28px" }}>
+              <button onClick={handlePrev} disabled={isFirst} style={arrowStyle(isFirst)}>
+                &#8249;
               </button>
-            ))}
-          </div>
+
+              <span style={{ fontSize: "15px", color: "#6b7280", minWidth: "120px", textAlign: "center" }}>
+                Page <strong style={{ color: "#111827" }}>{currentPage}</strong> of <strong style={{ color: "#111827" }}>{totalPages}</strong>
+              </span>
+
+              <button onClick={handleNext} disabled={isLast} style={arrowStyle(isLast)}>
+                &#8250;
+              </button>
+            </div>
+          )}
         </>
       )}
     </div>
