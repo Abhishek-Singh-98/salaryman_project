@@ -106,7 +106,6 @@ countries
 | shoulda-matchers	| One-liner model/association matchers in RSpec |
 | database_cleaner-active_record	| Cleans DB state between test runs |
 | rubocop	| Ruby style linter |
-Frontend (via Vite + npm):
 
 
 ## Getting Started
