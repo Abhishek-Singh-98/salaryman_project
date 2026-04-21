@@ -11,6 +11,7 @@
   - company_id (fk)
   - password
   - role (enum)
+  - active(true/false)
 
 - **Profile**
   - email
