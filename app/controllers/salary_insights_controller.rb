@@ -1,9 +1,9 @@
 class SalaryInsightsController < ApplicationController
-  include SalaryInsightsHelper
+  include SalaryInsightConcern
   before_action :authenticate_user
 
   def index
-    company_id = insight_params[:my_company_insight] == 'true' ? current_employee.company_id : nil
+    company_id = (insight_params[:my_company_insight] == 'true') ? current_hr_employee.company_id : nil
     country_id = insight_params[:country_id] ? insight_params[:country_id] : Country.pluck(:id)
     role = insight_params[:role].presence
     job_title_id = insight_params[:job_title_id].presence

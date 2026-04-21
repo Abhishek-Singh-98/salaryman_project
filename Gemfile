@@ -77,4 +77,4 @@ group :test do
 
 end
 
-# gem "vite_rails", "~> 3.10"
+gem "kaminari"

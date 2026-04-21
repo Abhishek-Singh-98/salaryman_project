@@ -22,7 +22,7 @@ RSpec.describe EmployeesController, type: :controller do
 
       it 'returns employees from current company' do
         get :index
-        json_response = JSON.parse(response.body)
+        json_response = JSON.parse(response.body)['employees']
         expect(json_response).to be_an(Array)
         expect(json_response.length).to eq(1)
         expect(json_response.first['id']).to eq(employee.id)
@@ -30,7 +30,7 @@ RSpec.describe EmployeesController, type: :controller do
 
       it 'includes profile data' do
         get :index
-        json_response = JSON.parse(response.body)
+        json_response = JSON.parse(response.body)['employees']
         expect(json_response.first).to have_key('profile')
       end
     end
@@ -203,7 +203,7 @@ RSpec.describe EmployeesController, type: :controller do
     end
 
     context 'with missing profile attributes' do
-      let(:no_profile_params) { valid_params.deep_merge(employee: { profile_attributes: nil }) }
+      let(:no_profile_params) { valid_params[:employee].merge(profile_attributes: {}) }
 
       it 'creates employee without profile' do
         expect {
@@ -321,7 +321,7 @@ RSpec.describe EmployeesController, type: :controller do
           email: hr_manager.profile.email, phone_number: hr_manager.profile.phone_number}
       end
 
-      it 'does not update job title of hr manager' do
+      it 'does update job title of hr manager' do
         put :update, params: update_params
         expect(hr_manager.job_title.reload).to eq(job_title)
       end

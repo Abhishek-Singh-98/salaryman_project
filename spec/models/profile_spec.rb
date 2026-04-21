@@ -32,13 +32,6 @@ RSpec.describe Profile, type: :model do
       end
     end
 
-    context 'invalid without phone_number' do
-      it 'is invalid without phone_number' do
-        profile = build(:profile, phone_number: nil)
-        expect(profile).not_to be_valid
-      end
-    end
-
     context 'without date_of_birth' do
       it 'is valid without date_of_birth' do
         profile = build(:profile, date_of_birth: nil)

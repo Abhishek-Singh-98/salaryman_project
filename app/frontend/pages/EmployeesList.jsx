@@ -4,21 +4,29 @@ import { useNavigate } from "react-router-dom";
 export default function EmployeesList() {
   const navigate = useNavigate();
   const [employees, setEmployees] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-  useEffect(() => {
-    fetch("/employees")
+  const fetchEmployees = (page = 1) => {
+    fetch(`/employees?page=${page}`)
       .then(response => response.json())
       .then(data => {
-        if (Array.isArray(data)) {
-          setEmployees(data);
+        if (data && Array.isArray(data.employees)) {
+          setEmployees(data.employees);
+          setTotalPages(data.pagination.total_pages || 1);
         } else {
           alert(data.message || "Unexpected response format");
           console.warn("Employees response was not an array:", data);
           setEmployees([]);
+          setTotalPages(1);
         }
       })
       .catch(error => console.error("Error fetching employees:", error));
-  }, []);
+  };
+
+  useEffect(() => {
+    fetchEmployees(currentPage);
+  }, [currentPage]);
 
   const handleDelete = async (id) => {
     if (!confirm("Are you sure you want to delete this employee?")) return;
@@ -34,17 +42,7 @@ export default function EmployeesList() {
     });
 
     if (response.ok) {
-      // Refresh the list
-      fetch("/employees")
-        .then(response => response.json())
-        .then(data => {
-          if (Array.isArray(data)) {
-            setEmployees(data);
-          } else {
-            setEmployees([]);
-          }
-        })
-        .catch(error => console.error("Error refreshing employees:", error));
+      fetchEmployees(currentPage);
     } else {
       alert("Failed to delete employee");
     }
@@ -75,73 +73,94 @@ export default function EmployeesList() {
       {employeeList.length === 0 ? (
         <p>No employees available.</p>
       ) : (
-        <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "20px" }}>
-          <thead>
-            <tr>
-              <th style={{ border: "1px solid #dddddd", padding: "8px" }}>ID</th>
-              <th style={{ border: "1px solid #dddddd", padding: "8px" }}>Full Name</th>
-              <th style={{ border: "1px solid #dddddd", padding: "8px" }}>Email</th>
-              <th style={{ border: "1px solid #dddddd", padding: "8px" }}>Role</th>
-              <th style={{ border: "1px solid #dddddd", padding: "8px" }}>Salary</th>
-              <th style={{ border: "1px solid #dddddd", padding: "8px" }}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {employeeList.map(employee => (
-              <tr key={employee.id}>
-                <td style={{ border: "1px solid #dddddd", padding: "8px" }}>{employee.id}</td>
-                <td style={{ border: "1px solid #dddddd", padding: "8px" }}>{employee.full_name}</td>
-                <td style={{ border: "1px solid #dddddd", padding: "8px" }}>{employee.profile?.email || ""}</td>
-                <td style={{ border: "1px solid #dddddd", padding: "8px" }}>{employee.role}</td>
-                <td style={{ border: "1px solid #dddddd", padding: "8px" }}>${employee.salary?.toLocaleString()}</td>
-                <td style={{ border: "1px solid #dddddd", padding: "8px" }}>
-                  <button
-                    onClick={() => navigate(`/employees/${employee.id}`)}
-                    style={{
-                      background: "#10b981",
-                      color: "#ffffff",
-                      border: "none",
-                      borderRadius: "4px",
-                      padding: "4px 8px",
-                      cursor: "pointer",
-                      marginRight: "4px",
-                    }}
-                  >
-                    Show
-                  </button>
-                  <button
-                    onClick={() => navigate(`/employees/${employee.id}/edit`)}
-                    style={{
-                      background: "#f59e0b",
-                      color: "#ffffff",
-                      border: "none",
-                      borderRadius: "4px",
-                      padding: "4px 8px",
-                      cursor: "pointer",
-                      marginRight: "4px",
-                    }}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(employee.id)}
-                    style={{
-                      background: "#ef4444",
-                      color: "#ffffff",
-                      border: "none",
-                      borderRadius: "4px",
-                      padding: "4px 8px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Delete
-                  </button>
-                </td>
+        <>
+          <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "20px" }}>
+            <thead>
+              <tr>
+                <th style={{ border: "1px solid #dddddd", padding: "8px" }}>ID</th>
+                <th style={{ border: "1px solid #dddddd", padding: "8px" }}>Full Name</th>
+                <th style={{ border: "1px solid #dddddd", padding: "8px" }}>Email</th>
+                <th style={{ border: "1px solid #dddddd", padding: "8px" }}>Role</th>
+                <th style={{ border: "1px solid #dddddd", padding: "8px" }}>Salary</th>
+                <th style={{ border: "1px solid #dddddd", padding: "8px" }}>Actions</th>
               </tr>
+            </thead>
+            <tbody>
+              {employeeList.map(employee => (
+                <tr key={employee.id}>
+                  <td style={{ border: "1px solid #dddddd", padding: "8px" }}>{employee.id}</td>
+                  <td style={{ border: "1px solid #dddddd", padding: "8px" }}>{employee.full_name}</td>
+                  <td style={{ border: "1px solid #dddddd", padding: "8px" }}>{employee.profile?.email || ""}</td>
+                  <td style={{ border: "1px solid #dddddd", padding: "8px" }}>{employee.role}</td>
+                  <td style={{ border: "1px solid #dddddd", padding: "8px" }}>${employee.salary?.toLocaleString()}</td>
+                  <td style={{ border: "1px solid #dddddd", padding: "8px" }}>
+                    <button
+                      onClick={() => navigate(`/employees/${employee.id}`)}
+                      style={{
+                        background: "#10b981",
+                        color: "#ffffff",
+                        border: "none",
+                        borderRadius: "4px",
+                        padding: "4px 8px",
+                        cursor: "pointer",
+                        marginRight: "4px",
+                      }}
+                    >
+                      Show
+                    </button>
+                    <button
+                      onClick={() => navigate(`/employees/${employee.id}/edit`)}
+                      style={{
+                        background: "#f59e0b",
+                        color: "#ffffff",
+                        border: "none",
+                        borderRadius: "4px",
+                        padding: "4px 8px",
+                        cursor: "pointer",
+                        marginRight: "4px",
+                      }}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(employee.id)}
+                      style={{
+                        background: "#ef4444",
+                        color: "#ffffff",
+                        border: "none",
+                        borderRadius: "4px",
+                        padding: "4px 8px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <div style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
+            {totalPages > 1 && Array.from({ length: totalPages }, (_, index) => (
+              <button
+                key={index + 1}
+                onClick={() => setCurrentPage(index + 1)}
+                style={{
+                  margin: "0 4px",
+                  padding: "8px 12px",
+                  background: currentPage === index + 1 ? "#7c3aed" : "#e5e7eb",
+                  color: currentPage === index + 1 ? "#ffffff" : "#000000",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                }}
+              >
+                {index + 1}
+              </button>
             ))}
-          </tbody>
-        </table>
+          </div>
+        </>
       )}
     </div>
-  )
+  );
 }

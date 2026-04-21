@@ -7,7 +7,8 @@ class AuthController < ApplicationController
 
   def sign_up
     @employee = Employee.new(sign_up_params)
-    assign_employee_number_and_role_to_hr
+    @employee.company = @company
+    @employee.role = :hr_manager
     @employee.build_profile(profile_params)
     if @employee.save
       session[:employee_id] = @employee.id

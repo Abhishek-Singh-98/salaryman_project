@@ -11,7 +11,7 @@ class Employee < ApplicationRecord
 
   validates :full_name, :emp_number, presence: true
   validates :emp_number, uniqueness: true
-  validates :salary, numericality: { greater_than: 0 } 
+  validates :salary, numericality: { greater_than: 0 }, allow_blank: true
 
   scope :only_active_employees, -> { where(active: true, role: :employee) }
 
@@ -23,12 +23,11 @@ class Employee < ApplicationRecord
     return unless self.company_id
 
     last_employee = Employee.where(company_id: self.company_id).order(:created_at).last
-    self.emp_number = if last_employee 
-      prefix = last_employee.emp_number[/[A-Za-z]+/]
-      number = last_employee.emp_number[/\d+/].to_i + 1
-      "#{prefix}#{number}"
+    self.emp_number = if last_employee&.emp_number =~ /\A(.+)-EMP(\d+)\z/
+      prefix, number = $1, $2.to_i + 1
+      "#{prefix}-EMP#{number}"
     else
-      "#{self.company.name[0..2].upcase}001"
+      "#{self.company.company_code.upcase}-EMP1"
     end
   end
 end
